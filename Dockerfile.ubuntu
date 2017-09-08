@@ -1,9 +1,9 @@
 # Requires docker >= 17.05 (requires support for multi-stage builds)
 # Usage example:
-#   SERVICE=galley; docker build -t $SERVICE --build-arg service=$SERVICE .
+#   SERVICE=brig; docker build -f Dockerfile.ubuntu -t $SERVICE --build-arg service=$SERVICE .
 
 # Builder stage
-FROM quay.io/wire/wire-server-cache:alpine as builder
+FROM quay.io/wire/wire-server-cache:ubuntu as builder
 
 ARG service
 COPY . /src
@@ -13,7 +13,7 @@ RUN cd /src/services/${service} \
     && stack install --pedantic --test --local-bin-path=/dist
 
 # Minified stage
-FROM quay.io/wire/alpine-deps:latest
+FROM quay.io/wire/wire-server-deps:ubuntu
 
 ARG service
 COPY --from=builder /dist/${service} /usr/local/bin/${service}

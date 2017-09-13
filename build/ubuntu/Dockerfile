@@ -1,6 +1,7 @@
 # Requires docker >= 17.05 (requires support for multi-stage builds)
 # Usage example:
-#   SERVICE=brig; docker build -f Dockerfile.ubuntu -t $SERVICE --build-arg service=$SERVICE .
+#   (from wire-server root directory)
+#   SERVICE=brig; docker build -f build/ubuntu/Dockerfile -t $SERVICE --build-arg service=$SERVICE .
 
 # Builder stage
 FROM quay.io/wire/wire-server-cache:ubuntu as builder
@@ -8,9 +9,7 @@ FROM quay.io/wire/wire-server-cache:ubuntu as builder
 ARG service
 COPY . /src
 
-RUN cd /src/services/${service} \
-    && mkdir -p /dist \
-    && stack install --pedantic --test --local-bin-path=/dist
+RUN cd /src/services/${service} && make
 
 # Minified stage
 FROM quay.io/wire/wire-server-deps:ubuntu
